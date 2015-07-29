@@ -58,7 +58,16 @@ public class MyResource {
     @POST
     @Path("transactions")
     @Produces(MediaType.APPLICATION_JSON)
-    public String postTransactions() {
-        return "New transaction";
+    public String postTransactions(@Context UriInfo info) {
+        String token = info.getQueryParameters().getFirst("token");
+        String userId = "error";
+        try {
+            userId = db.checkToken(token);
+        }
+        catch(IllegalArgumentException e) {
+            System.out.print(e.getMessage());
+            return "error";
+        }
+        return "New transaction for" + token + userId;
     }
 }
