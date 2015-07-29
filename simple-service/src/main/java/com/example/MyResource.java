@@ -20,7 +20,7 @@ import javax.ws.rs.core.UriInfo;
 public class MyResource {
     
     
-
+    Database db = new Database ();
     /**
      * Method handling HTTP GET requests. The returned object will be sent
      * to the client as "text/plain" media type.
@@ -30,22 +30,24 @@ public class MyResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public String getBase() {
-        return "Login here";
+        return "Api base";
     }
     
     @GET
-    @Path("login")
+    @Path("account")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getLogin(@Context UriInfo info) {
+    public String getAccount(@Context UriInfo info) {
         String username = info.getQueryParameters().getFirst("username");
         String password = info.getQueryParameters().getFirst("password");
-        Auth auth = new Auth ();
-        if(auth.verifyCredentials(username, password)) {
-            return "inloggad";
+        
+        String token = "";
+        try {
+            token = db.verifyCredentials(username, password);
         }
-        else {
-            return "fel uppgifter";
+        catch(IllegalArgumentException e) {
+            System.out.print(e.getMessage());
         }
+        return token;
     }
     
     @GET
