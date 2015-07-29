@@ -7,6 +7,7 @@ package com.example;
 
 import java.sql.*;
 import java.util.UUID;
+import org.mindrot.jbcrypt.BCrypt;
 
 /**
  *
@@ -54,7 +55,7 @@ public class Database {
         return token;
     }
     
-    private String checkToken(String token) {
+    public String checkToken(String token) {
         try {
             PreparedStatement query = connection.prepareStatement(
                 "SELECT * FROM tokens WHERE token = ? LIMIT 1"
@@ -97,11 +98,73 @@ public class Database {
     }
     
     public String verifyCredentials(String username, String password) {
-        if(username.equals("max") && password.equals("javaproffs")) {
-            return createToken(username);
+        String token = null;
+        try {
+            PreparedStatement query = connection.prepareStatement(
+                "SELECT email, password FROM users WHERE email = ?"
+            );
+            query.setString(1, username);
+            ResultSet rs = query.executeQuery();
+            rs.next();
+            System.out.println(rs.getString("password"));
+            if (BCrypt.checkpw(password, rs.getString("password"))) {
+                System.out.println("Correct password!");
+                token = createToken(rs.getString("email"));
+            }
+            else {
+                throw new IllegalArgumentException("Invalid credentials");
+            }
+            
         }
-        else {
-            throw new IllegalArgumentException("Invalid credentials");
+        catch(SQLException e) {
+            System.out.println("Failed");
+            e.printStackTrace();
         }
+        return token;
+    }
+    
+    public String createUser(String username, String password) {
+        String hashed = BCrypt.hashpw(password, BCrypt.gensalt(12));
+        String token = null;
+        
+        try {
+            PreparedStatement query = connection.prepareStatement(
+                "INSERT INTO users (email, password) VALUES (?, ?) LIMIT 1 RETURNING userid, email"
+            );
+            query.setString(1, username);
+            query.setString(2, hashed);
+            ResultSet rs = query.executeQuery(); // http://stackoverflow.com/a/21276130
+            rs.next();
+            System.out.println(rs.getInt("userid"));
+            token = createToken(rs.getString("email"));
+            System.out.println(token);
+        }
+        catch(SQLException e) {
+            System.out.print("Failed");
+            e.printStackTrace();
+        }
+        return token;
+    }
+    
+    public boolean checkUserFree(String username) {
+        boolean free = false;
+        try {
+            PreparedStatement query = connection.prepareStatement(
+                "SELECT count(*) AS sum FROM users WHERE email = ?"
+            );
+            query.setString(1, username);
+            ResultSet rs = query.executeQuery();
+            rs.next();
+            if(rs.getInt("sum") == 0) {
+                free = true;
+                System.out.println("free!");
+            }
+            
+        }
+        catch(SQLException e) {
+            System.out.println("Failed");
+            e.printStackTrace();
+        }
+        return free;
     }
 }

@@ -14,7 +14,7 @@ import javax.ws.rs.core.UriInfo;
 // http://www.mkyong.com/webservices/jax-rs/jax-rs-queryparam-example/
 
 /**
- * Root resource (exposed at "myresource" path)
+ * Root resource (exposed at "api" path)
  */
 @Path("api")
 public class MyResource {
@@ -50,6 +50,20 @@ public class MyResource {
         return token;
     }
     
+    @POST
+    @Path("account")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String createAccount(@Context UriInfo info) {
+        String username = info.getQueryParameters().getFirst("username");
+        String password = info.getQueryParameters().getFirst("password");
+        String token = null;
+        
+        if(db.checkUserFree(username)) {
+            token = db.createUser(username, password);
+        }
+        return token;
+    }
+    
     @GET
     @Path("transactions")
     @Produces(MediaType.APPLICATION_JSON)
@@ -61,6 +75,7 @@ public class MyResource {
     @Path("transactions")
     @Produces(MediaType.APPLICATION_JSON)
     public String postTransactions(@Context UriInfo info) {
+        
         String token = info.getQueryParameters().getFirst("token");
         String userId = "error";
         try {
