@@ -43,33 +43,33 @@ public class MyResource extends Application {
     
     @GET
     @Path("account")
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response getAccount(@Context UriInfo info) {
         String username = info.getQueryParameters().getFirst("username");
         String password = info.getQueryParameters().getFirst("password");
         
-        String token = "";
+        String token;
         try {
             token = db.verifyCredentials(username, password);
         }
         catch(IllegalArgumentException e) {
-            return Response.status(401).entity(e.getMessage()).header("Access-Control-Allow-Origin", "*").build();
+            return Response.status(401).entity(JSONUtil.String2JSONStringError(e.getMessage())).header("Access-Control-Allow-Origin", "*").build();
         }
-        return Response.ok(token).header("Access-Control-Allow-Origin", "*").build();
+        return Response.ok(JSONUtil.String2JSONString(token)).header("Access-Control-Allow-Origin", "*").build();
     }
     
     @GET
     @Path("verifytoken")
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
     public Response verifyToken(@Context UriInfo info) {
         String token = info.getQueryParameters().getFirst("token");
         try {
             token = db.checkToken(token);
         }
         catch(IllegalArgumentException e) {
-            return Response.status(401).entity(e.getMessage()).header("Access-Control-Allow-Origin", "*").build();
+            return Response.status(401).entity(JSONUtil.String2JSONStringError(e.getMessage())).header("Access-Control-Allow-Origin", "*").build();
         }
-        return Response.ok(token).header("Access-Control-Allow-Origin", "*").build();
+        return Response.ok(JSONUtil.Int2JSONString(userid)).header("Access-Control-Allow-Origin", "*").build();
     }
     
     @POST
@@ -93,7 +93,7 @@ public class MyResource extends Application {
     @Path("transactions")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTransactions() {
-        return Response.ok("My transactions").header("Access-Control-Allow-Origin", "*").build();
+        return Response.ok(JSONUtil.String2JSONString("My transactions")).header("Access-Control-Allow-Origin", "*").build();
     }
     
     @POST
@@ -102,7 +102,7 @@ public class MyResource extends Application {
     public String postTransactions(@Context UriInfo info) {
         
         String token = info.getQueryParameters().getFirst("token");
-        String userId = "error";
+        int userId;
         try {
             userId = db.checkToken(token);
         }
