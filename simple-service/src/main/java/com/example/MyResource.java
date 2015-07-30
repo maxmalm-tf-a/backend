@@ -16,8 +16,16 @@ import javax.ws.rs.core.UriInfo;
  * Root resource (exposed at "api" path)
  */
 @Path("api")
-public class MyResource {
+public class MyResource extends Application {
     
+    @Override
+    public Set<Class<?>> getClasses() {
+        final Set<Class<?>> classes = new HashSet<Class<?>>();
+        // Register my custom provider.
+        classes.add(CORS.class);
+        System.out.println("asdasd");
+        return classes;
+    }
     
     Database db = new Database ();
     /**
