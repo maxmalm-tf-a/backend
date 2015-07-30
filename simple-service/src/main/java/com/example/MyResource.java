@@ -49,6 +49,19 @@ public class MyResource {
         }
         return Response.ok(token).header("Access-Control-Allow-Origin", "*").build();
     }
+    
+    @GET
+    @Path("verifytoken")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response verifyToken(@Context UriInfo info) {
+        String token = info.getQueryParameters().getFirst("token");
+        try {
+            token = db.checkToken(token);
+        }
+        catch(IllegalArgumentException e) {
+            return Response.status(401).entity(e.getMessage()).header("Access-Control-Allow-Origin", "*").build();
+        }
+        return Response.ok(token).header("Access-Control-Allow-Origin", "*").build();
     }
     
     @POST
