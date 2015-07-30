@@ -38,14 +38,14 @@ public class Database {
         }
     }
         
-    private String createToken(String userId) {
+    private String createToken(int userId) {
         String token = UUID.randomUUID().toString();
         try {
             PreparedStatement query = connection.prepareStatement(
                 "INSERT INTO tokens VALUES (?, now() + '30 minutes', ?) LIMIT 1"
             );
             query.setString(1, token);
-            query.setString(2, userId);
+            query.setInt(2, userId);
             query.executeUpdate(); // http://stackoverflow.com/a/21276130
         }
         catch(SQLException e) {
@@ -55,7 +55,7 @@ public class Database {
         return token;
     }
     
-    public String checkToken(String token) {
+    public int checkToken(String token) {
         try {
             PreparedStatement query = connection.prepareStatement(
                 "SELECT * FROM tokens WHERE token = ? LIMIT 1"
@@ -73,7 +73,7 @@ public class Database {
             if(new Timestamp(date.getTime()).before(rs.getTimestamp("validuntil"))) {
                 System.out.println("Token valid");
                 extendToken(token); // extend the life of the token for 30 minutes
-                return rs.getString("userId");
+                return rs.getInt("userid");
             }
             else {
                 System.out.println("Token expired");
@@ -83,8 +83,8 @@ public class Database {
         catch(SQLException e) {
             System.out.print("Failed");
             e.printStackTrace();
-        } 
-        return "error";
+        }
+        return 0;
     }
     
     public void extendToken(String token) {
@@ -106,7 +106,7 @@ public class Database {
         String token = null;
         try {
             PreparedStatement query = connection.prepareStatement(
-                "SELECT email, password FROM users WHERE email = ?"
+                "SELECT email, password, userid FROM users WHERE email = ?"
             );
             query.setString(1, username);
             ResultSet rs = query.executeQuery();
@@ -114,7 +114,7 @@ public class Database {
             System.out.println(rs.getString("password"));
             if (BCrypt.checkpw(password, rs.getString("password"))) {
                 System.out.println("Correct password!");
-                token = createToken(rs.getString("email"));
+                token = createToken(rs.getInt("userid"));
             }
             else {
                 throw new IllegalArgumentException("Invalid credentials");
@@ -140,8 +140,7 @@ public class Database {
             query.setString(2, hashed);
             ResultSet rs = query.executeQuery(); // http://stackoverflow.com/a/21276130
             rs.next();
-            System.out.println(rs.getInt("userid"));
-            token = createToken(rs.getString("email"));
+            token = createToken(rs.getInt("userid"));
             System.out.println(token);
         }
         catch(SQLException e) {

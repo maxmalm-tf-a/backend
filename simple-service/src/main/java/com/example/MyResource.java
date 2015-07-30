@@ -63,8 +63,10 @@ public class MyResource extends Application {
     @Produces(MediaType.APPLICATION_JSON)
     public Response verifyToken(@Context UriInfo info) {
         String token = info.getQueryParameters().getFirst("token");
+        int userid;
         try {
-            token = db.checkToken(token);
+            userid = db.checkToken(token);
+            System.out.println(userid);
         }
         catch(IllegalArgumentException e) {
             return Response.status(401).entity(JSONUtil.String2JSONStringError(e.getMessage())).header("Access-Control-Allow-Origin", "*").build();
