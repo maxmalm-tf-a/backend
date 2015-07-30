@@ -1,17 +1,16 @@
 package com.example;
 
+import java.util.HashSet;
+import java.util.Set;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-
-// http://www.mkyong.com/webservices/jax-rs/jax-rs-queryparam-example/
 
 /**
  * Root resource (exposed at "api" path)
@@ -28,15 +27,16 @@ public class MyResource {
      * @return String that will be returned as a text/plain response.
      */
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public String getBase() {
-        return "Api base";
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response getBase() {
+        System.out.println("123123");
+        return Response.ok("hello").header("Access-Control-Allow-Origin", "*").build();
     }
     
     @GET
     @Path("account")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String getAccount(@Context UriInfo info) {
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response getAccount(@Context UriInfo info) {
         String username = info.getQueryParameters().getFirst("username");
         String password = info.getQueryParameters().getFirst("password");
         
@@ -45,15 +45,16 @@ public class MyResource {
             token = db.verifyCredentials(username, password);
         }
         catch(IllegalArgumentException e) {
-            System.out.print(e.getMessage());
+            return Response.status(401).entity(e.getMessage()).header("Access-Control-Allow-Origin", "*").build();
         }
-        return token;
+        return Response.ok(token).header("Access-Control-Allow-Origin", "*").build();
+    }
     }
     
     @POST
     @Path("account")
     @Produces(MediaType.APPLICATION_JSON)
-    public String createAccount(@Context UriInfo info) {
+    public Response createAccount(@Context UriInfo info) {
         String username = info.getQueryParameters().getFirst("username");
         String password = info.getQueryParameters().getFirst("password");
         String token = null;
@@ -61,14 +62,17 @@ public class MyResource {
         if(db.checkUserFree(username)) {
             token = db.createUser(username, password);
         }
-        return token;
+        else {
+            return Response.status(401).entity("Username taken").header("Access-Control-Allow-Origin", "*").build();
+        }
+        return Response.ok(token).header("Access-Control-Allow-Origin", "*").build();
     }
     
     @GET
     @Path("transactions")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getTransactions() {
-        return "My transactions";
+    public Response getTransactions() {
+        return Response.ok("My transactions").header("Access-Control-Allow-Origin", "*").build();
     }
     
     @POST
