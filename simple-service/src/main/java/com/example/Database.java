@@ -171,4 +171,30 @@ public class Database {
         }
         return free;
     }
+    
+    public ResultSet getTransactions(String token) {
+        int userid = checkToken(token);
+        ResultSet rs = null;
+        if(userid > 0) {
+            try {
+                PreparedStatement query = connection.prepareStatement(
+                    "SELECT text, value, sum, date FROM transactions WHERE userid = ? ORDER BY transactionid Desc"
+                );
+                query.setInt(1, userid);
+                rs = query.executeQuery(); // http://stackoverflow.com/a/21276130
+            }
+            catch(SQLException e) {
+                System.out.print("Failed");
+                e.printStackTrace();
+            }
+        }
+        else {
+            throw new IllegalArgumentException("Token invalid");
+        }
+        return rs;
+    }
+    
+    public void insertTransactions(String token, String text, int value) {
+        // select top 1 * from TABLE order by date desc
+    }
 }

@@ -1,5 +1,6 @@
 package com.example;
 
+import java.sql.ResultSet;
 import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.GET;
@@ -11,6 +12,7 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
+import net.sf.json.JSONObject;
 
 /**
  * Root resource (exposed at "api" path)
@@ -94,8 +96,11 @@ public class MyResource extends Application {
     @GET
     @Path("transactions")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getTransactions() {
-        return Response.ok(JSONUtil.String2JSONString("My transactions")).header("Access-Control-Allow-Origin", "*").build();
+    public Response getTransactions(@Context UriInfo info) {
+        String token = info.getQueryParameters().getFirst("token");
+        ResultSet rs = db.getTransactions(token);
+        String result = JSONUtil.ResultSet2JSONString(rs);
+        return Response.ok(result).header("Access-Control-Allow-Origin", "*").build();
     }
     
     @POST
