@@ -62,6 +62,10 @@ public class Database {
             );
             query.setString(1, token);
             ResultSet rs = query.executeQuery(); // http://stackoverflow.com/a/21276130
+            if (!rs.isBeforeFirst() ) {
+                System.out.println("No token found");
+                throw new IllegalArgumentException("No token found");
+            }
             rs.next();
             System.out.println(rs.getTimestamp("validUntil"));
             java.util.Date date= new java.util.Date();
@@ -73,6 +77,7 @@ public class Database {
             }
             else {
                 System.out.println("Token expired");
+                throw new IllegalArgumentException("Token expired");
             }
         }
         catch(SQLException e) {
