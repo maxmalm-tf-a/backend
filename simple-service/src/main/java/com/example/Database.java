@@ -8,6 +8,9 @@ package com.example;
 import java.sql.*;
 import java.util.UUID;
 import org.mindrot.jbcrypt.BCrypt;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 /**
  *
@@ -67,9 +70,7 @@ public class Database {
                 throw new IllegalArgumentException("No token found");
             }
             rs.next();
-            System.out.println(rs.getTimestamp("validUntil"));
             java.util.Date date= new java.util.Date();
-            System.out.println(new Timestamp(date.getTime()));
             if(new Timestamp(date.getTime()).before(rs.getTimestamp("validuntil"))) {
                 System.out.println("Token valid");
                 extendToken(token); // extend the life of the token for 30 minutes
@@ -194,7 +195,71 @@ public class Database {
         return rs;
     }
     
-    public void insertTransactions(String token, String text, int value) {
-        // select top 1 * from TABLE order by date desc
+    public void clearTransactions(String token) {
+        int userid = checkToken(token);
+        if(userid > 0) {
+            try {
+                PreparedStatement query = connection.prepareStatement(
+                    "DELETE FROM transactions WHERE userid = ?"
+                );
+                query.setInt(1, userid);
+                query.executeUpdate(); // http://stackoverflow.com/a/21276130
+            }
+            catch(SQLException e) {
+                System.out.print("Failed");
+                e.printStackTrace();
+            }
+        }
+        else {
+            throw new IllegalArgumentException("Token invalid");
+        }
+    }
+    
+    public void insertTransactions(String token, String text, int value, String category, int daysago) {
+        int userid = checkToken(token);
+        ResultSet rs;
+        int sum = 0;
+        
+        if(userid > 0) {
+            try {
+                PreparedStatement query = connection.prepareStatement(
+                    "SELECT sum FROM transactions WHERE userid = ? ORDER BY transactionid Desc LIMIT 1"
+                );
+                query.setInt(1, userid);
+                rs = query.executeQuery(); // http://stackoverflow.com/a/21276130
+                while(rs.next()) {
+                    System.out.println("yolo");
+                    System.out.println(rs.getInt("sum"));
+                    sum = rs.getInt("sum");
+                }
+                System.out.println(sum);
+                PreparedStatement insert = connection.prepareStatement(
+                    "INSERT INTO transactions (userid, text, value, sum, category, date) VALUES (?, ?, ?, ?, ?, ?) LIMIT 1"
+                );
+                insert.setInt(1, userid);
+                insert.setString(2, text);
+                insert.setInt(3, value);
+                insert.setInt(4, sum + value);
+                insert.setString(5, category);
+                insert.setString(6, getDate(daysago));
+                insert.executeUpdate(); 
+            }
+            catch(SQLException e) {
+                System.out.println("Failed insert");
+                e.printStackTrace();
+            }
+            System.out.println("added");
+            
+        }
+        else {
+            throw new IllegalArgumentException("Token invalid");
+        }
+    }
+    
+    public String getDate(int daysago) {
+        DateTime date = new DateTime();
+        DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy-MM-dd");
+        date = date.minusDays(daysago);
+        return fmt.print(date);
     }
 }

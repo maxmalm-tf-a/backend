@@ -119,4 +119,54 @@ public class MyResource extends Application {
         }
         return "New transaction for" + token + userId;
     }
+    
+    @GET
+    @Path("populate") // could not use "seed" here for some reason
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response postSeedTransactions(@Context UriInfo info) {
+        
+        System.out.println("hi!");
+        
+        String token = info.getQueryParameters().getFirst("token");
+        int userId;
+        try {
+            userId = db.checkToken(token);
+        }
+        catch(IllegalArgumentException e) {
+            System.out.print(e.getMessage());
+            return Response.status(401).entity("Wrong token").header("Access-Control-Allow-Origin", "*").build();
+        }
+        db.clearTransactions(token);
+        db.insertTransactions(token, "Lön", 40000, "Inkomst", 30);
+        db.insertTransactions(token, "Kaffe", -40, "Nöje", 29);
+        db.insertTransactions(token, "Hyra", -5000, "Bostad", 28);
+        db.insertTransactions(token, "Avanza", -2000, "Sparande", 27);
+        db.insertTransactions(token, "Kaffe", -40, "Nöje", 26);
+        db.insertTransactions(token, "Kaffe", -40, "Nöje", 25);
+        db.insertTransactions(token, "Kaffe", -40, "Nöje", 24);
+        db.insertTransactions(token, "Kaffe", -40, "Nöje", 23);
+        db.insertTransactions(token, "Kaffe", -40, "Nöje", 22);
+        db.insertTransactions(token, "Kaffe", -40, "Nöje", 21);
+        db.insertTransactions(token, "Kaffe", -40, "Nöje", 20);
+        db.insertTransactions(token, "Kaffe", -40, "Nöje", 19);
+        db.insertTransactions(token, "Kaffe", -40, "Nöje", 18);
+        db.insertTransactions(token, "Kaffe", -40, "Nöje", 17);
+        db.insertTransactions(token, "Systembolaget", -493, "Nöje", 16);
+        db.insertTransactions(token, "Kaffe", -40, "Nöje", 15);
+        db.insertTransactions(token, "Kaffe", -40, "Nöje", 14);
+        db.insertTransactions(token, "Kaffe", -40, "Nöje", 13);
+        db.insertTransactions(token, "Kaffe", -40, "Nöje", 12);
+        db.insertTransactions(token, "Kaffe", -40, "Nöje", 11);
+        db.insertTransactions(token, "Kaffe", -40, "Nöje", 9);
+        db.insertTransactions(token, "Kaffe", -40, "Nöje", 8);
+        db.insertTransactions(token, "Kaffe", -40, "Nöje", 7);
+        db.insertTransactions(token, "Kaffe", -40, "Nöje", 6);
+        db.insertTransactions(token, "Kaffe", -40, "Nöje", 5);
+        db.insertTransactions(token, "Kaffe", -40, "Nöje", 4);
+        db.insertTransactions(token, "Kaffe", -40, "Nöje", 3);
+        db.insertTransactions(token, "Kaffe", -40, "Nöje", 2);
+        db.insertTransactions(token, "Kaffe", -40, "Nöje", 1);
+        
+        return Response.ok(JSONUtil.String2JSONString("nice")).header("Access-Control-Allow-Origin", "*").build();
+    }
 }
