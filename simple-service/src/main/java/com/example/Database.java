@@ -179,7 +179,7 @@ public class Database {
         if(userid > 0) {
             try {
                 PreparedStatement query = connection.prepareStatement(
-                    "SELECT text, value, sum, date FROM transactions WHERE userid = ? ORDER BY transactionid Desc"
+                    "SELECT text, value, sum, date, category FROM transactions WHERE userid = ? ORDER BY transactionid Desc"
                 );
                 query.setInt(1, userid);
                 rs = query.executeQuery(); // http://stackoverflow.com/a/21276130
