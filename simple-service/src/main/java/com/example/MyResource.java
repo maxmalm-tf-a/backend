@@ -141,8 +141,8 @@ public class MyResource extends Application {
         db.insertTransactions(token, "Kaffe", -40, "Nöje", 29);
         db.insertTransactions(token, "Hyra", -5000, "Bostad", 28);
         db.insertTransactions(token, "Avanza", -2000, "Sparande", 27);
-        db.insertTransactions(token, "Kaffe", -40, "Nöje", 26);
-        db.insertTransactions(token, "Kaffe", -40, "Nöje", 25);
+        db.insertTransactions(token, "Lego", -400, "Nöje", 26);
+        db.insertTransactions(token, "Skatteåterbäring", 500, "Nöje", 25);
         db.insertTransactions(token, "Kaffe", -40, "Nöje", 24);
         db.insertTransactions(token, "Kaffe", -40, "Nöje", 23);
         db.insertTransactions(token, "Kaffe", -40, "Nöje", 22);
@@ -160,7 +160,7 @@ public class MyResource extends Application {
         db.insertTransactions(token, "Kaffe", -40, "Nöje", 9);
         db.insertTransactions(token, "Kaffe", -40, "Nöje", 8);
         db.insertTransactions(token, "Kaffe", -40, "Nöje", 7);
-        db.insertTransactions(token, "Kaffe", -40, "Nöje", 6);
+        db.insertTransactions(token, "Trissvinst", 25, "Nöje", 6);
         db.insertTransactions(token, "Kaffe", -40, "Nöje", 5);
         db.insertTransactions(token, "Kaffe", -40, "Nöje", 4);
         db.insertTransactions(token, "Kaffe", -40, "Nöje", 3);
