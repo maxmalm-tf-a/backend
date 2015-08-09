@@ -88,9 +88,9 @@ public class MyResource extends Application {
             token = db.createUser(username, password);
         }
         else {
-            return Response.status(401).entity("Username taken").header("Access-Control-Allow-Origin", "*").build();
+            return Response.status(401).entity(JSONUtil.String2JSONStringError("Username taken")).header("Access-Control-Allow-Origin", "*").build();
         }
-        return Response.ok(token).header("Access-Control-Allow-Origin", "*").build();
+        return Response.ok(JSONUtil.String2JSONString(token)).header("Access-Control-Allow-Origin", "*").build();
     }
     
     @GET
