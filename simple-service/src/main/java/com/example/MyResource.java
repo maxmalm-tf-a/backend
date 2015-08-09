@@ -39,7 +39,6 @@ public class MyResource extends Application {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public Response getBase() {
-        System.out.println("123123");
         return Response.ok("hello").header("Access-Control-Allow-Origin", "*").build();
     }
     
@@ -76,8 +75,8 @@ public class MyResource extends Application {
         return Response.ok(JSONUtil.Int2JSONString(userid)).header("Access-Control-Allow-Origin", "*").build();
     }
     
-    @POST
-    @Path("account")
+    @GET
+    @Path("register")
     @Produces(MediaType.APPLICATION_JSON)
     public Response createAccount(@Context UriInfo info) {
         String username = info.getQueryParameters().getFirst("username");
@@ -134,7 +133,7 @@ public class MyResource extends Application {
         }
         catch(IllegalArgumentException e) {
             System.out.print(e.getMessage());
-            return Response.status(401).entity("Wrong token").header("Access-Control-Allow-Origin", "*").build();
+            return Response.status(401).entity(JSONUtil.String2JSONStringError("Wrong token")).header("Access-Control-Allow-Origin", "*").build();
         }
         db.clearTransactions(token);
         db.insertTransactions(token, "Lön", 40000, "Inkomst", 30);
