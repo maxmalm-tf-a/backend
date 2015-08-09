@@ -105,17 +105,27 @@ public class Database {
     
     public String verifyCredentials(String username, String password) {
         String token = null;
+        String dbPassword = null;
+        int dbUserId = 0;
+        int rowCount = 0;
         try {
             PreparedStatement query = connection.prepareStatement(
-                "SELECT email, password, userid FROM users WHERE email = ?"
+                "SELECT email, password, userid FROM users WHERE email = ? LIMIT 1"
             );
             query.setString(1, username);
             ResultSet rs = query.executeQuery();
-            rs.next();
-            System.out.println(rs.getString("password"));
-            if (BCrypt.checkpw(password, rs.getString("password"))) {
+            
+            while(rs.next()) {
+                rowCount++;
+                dbPassword = rs.getString("password");
+                dbUserId = rs.getInt("userid");
+            }
+            if(rowCount == 0) {
+                throw new IllegalArgumentException("No user found");
+            }
+            if (BCrypt.checkpw(password, dbPassword)) {
                 System.out.println("Correct password!");
-                token = createToken(rs.getInt("userid"));
+                token = createToken(dbUserId);
             }
             else {
                 throw new IllegalArgumentException("Invalid credentials");
